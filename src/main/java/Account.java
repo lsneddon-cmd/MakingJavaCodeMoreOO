@@ -45,6 +45,10 @@ public class Account {
             return;
         if (this.isClosed)
             return;
+        if (this.isFrozen) {
+            this.isFrozen = false;
+            this.onUnfrozen.handle();
+        }
         this.balance = this.balance.subtract(amount);
     }
 }
