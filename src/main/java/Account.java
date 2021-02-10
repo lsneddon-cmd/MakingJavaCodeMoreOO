@@ -3,10 +3,15 @@ import java.math.BigDecimal;
 public class Account {
     private boolean isVerified;
     private boolean isClosed;
+    private boolean isFrozen;
     private BigDecimal balance;
 
-    public Account() {
+    private AccountUnfrozen onUnfrozen;
+
+    public Account(AccountUnfrozen onUnfrozen) {
         this.balance = BigDecimal.ZERO;
+        this.onUnfrozen = onUnfrozen;
+
     }
 
     public void holderVerified() {
@@ -17,9 +22,21 @@ public class Account {
         this.isClosed = true;
     }
 
+    public void freezeAccount() {
+        if (this.isClosed)
+            return;
+        if (!this.isVerified)
+            return;
+        this.isFrozen = true;
+    }
+
     public void deposit(BigDecimal amount) {
         if (this.isClosed)
             return;
+        if (this.isFrozen) {
+            this.isFrozen = false;
+            this.onUnfrozen.handle();
+        }
         this.balance = this.balance.add(amount);
     }
 
